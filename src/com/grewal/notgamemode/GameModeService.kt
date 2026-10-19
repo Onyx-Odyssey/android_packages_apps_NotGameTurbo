@@ -109,6 +109,8 @@ class GameModeService : Service() {
             when (prefs.thermalMode) {
                 ThermalProfile.MODE_NORMAL -> ThermalProfile.NORMAL
                 ThermalProfile.MODE_GAME -> ThermalProfile.GAME
+                ThermalProfile.MODE_NO_LIMITS ->
+                    if (power.isInteractive) ThermalProfile.NO_LIMITS else ThermalProfile.NORMAL
                 // The last foreground app stays "foreground" with the screen off
                 else ->
                     if (!power.isInteractive) ThermalProfile.NORMAL

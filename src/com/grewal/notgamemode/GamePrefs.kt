@@ -39,8 +39,9 @@ class GamePrefs(context: Context) {
         prefs.getInt(expertPresetKey(pkg), TouchFeatureManager.EXPERT_RANGE.def)
 
     /** One of the ThermalProfile.MODE_* values. */
-    val thermalMode: String
+    var thermalMode: String
         get() = prefs.getString(KEY_THERMAL_MODE, ThermalProfile.MODE_AUTO)!!
+        set(value) = prefs.edit().putString(KEY_THERMAL_MODE, value).apply()
 
     companion object {
         const val NAME = "game_mode"

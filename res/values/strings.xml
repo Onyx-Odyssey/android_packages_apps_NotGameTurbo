@@ -24,8 +24,12 @@
         <item>Automatic (per app)</item>
         <item>Always normal</item>
         <item>Always game</item>
+        <item>No limits (thermal bypass)</item>
     </string-array>
-    <string name="thermal_mode_footer">Automatic uses Xiaomi\'s own thermal profiles: game for games and apps with game mode on, camera for the camera, video for video apps, navigation for maps, and normal for everything else and while the screen is off. Normal runs coolest.</string>
+    <string name="thermal_mode_footer">Automatic uses Xiaomi\'s own thermal profiles: game for games and apps with game mode on, camera for the camera, video for video apps, navigation for maps, and normal for everything else and while the screen is off. Normal runs coolest. No limits goes back to Automatic after a reboot.</string>
+    <string name="thermal_nolimits_title">Bypass the thermal engine?</string>
+    <string name="thermal_nolimits_message">Are you sure you want to bypass your phone\'s thermal engine? It can turn your phone into a pocket nuke. Don\'t throw it at other people.\n\nNo joke this time: this switches to Xiaomi\'s loosest thermal profile, so the phone can get very hot. Only use it with real cooling, like a phone cooler. Playing while plugged in? Turn on Bypass charging (Bypass mode) first: Xiaomi\'s no-limits profile also lifts the screen-on charging limit, and bypass keeps the battery from charging, so the phone runs straight from the charger without the extra charging heat. The kernel\'s overheat shutdown still protects the phone, the screen-off state goes back to normal, and this setting turns itself off after a reboot.</string>
+    <string name="thermal_nolimits_confirm">I have a cooler, do it</string>
     <string name="thermal_unavailable_summary">The thermal profile node is not writable on this build.</string>
 
     <string name="games_category_title">Games</string>

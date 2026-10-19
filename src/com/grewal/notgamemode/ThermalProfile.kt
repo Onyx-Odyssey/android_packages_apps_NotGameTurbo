@@ -25,6 +25,8 @@ object ThermalProfile {
     private const val SCONFIG = "/sys/devices/virtual/thermal/thermal_message/sconfig"
 
     const val NORMAL = 0
+    // "evaluation" in the stock map: Xiaomi's benchmark scenario, the loosest one
+    const val NO_LIMITS = 6
     const val NAVIGATION = 10
     const val VIDEO = 11
     const val CAMERA = 15
@@ -34,6 +36,8 @@ object ThermalProfile {
     const val MODE_AUTO = "auto"
     const val MODE_NORMAL = "normal"
     const val MODE_GAME = "game"
+    /** Reset to [MODE_AUTO] on every boot. */
+    const val MODE_NO_LIMITS = "nolimits"
 
     private var cameraPackages: Set<String>? = null
     private var written: Int? = null

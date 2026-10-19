@@ -14,6 +14,11 @@ class BootReceiver : BroadcastReceiver() {
         if (intent.action != Intent.ACTION_BOOT_COMPLETED) {
             return
         }
+        // No limits never survives a reboot
+        val prefs = GamePrefs(context)
+        if (prefs.thermalMode == ThermalProfile.MODE_NO_LIMITS) {
+            prefs.thermalMode = ThermalProfile.MODE_AUTO
+        }
         context.startService(Intent(context, GameModeService::class.java))
     }
 }

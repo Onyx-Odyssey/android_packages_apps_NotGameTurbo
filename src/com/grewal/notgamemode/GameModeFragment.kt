@@ -91,11 +91,26 @@ class GameModeFragment : SettingsBasePreferenceFragment() {
                         ThermalProfile.MODE_AUTO,
                         ThermalProfile.MODE_NORMAL,
                         ThermalProfile.MODE_GAME,
+                        ThermalProfile.MODE_NO_LIMITS,
                     )
                 setDefaultValue(ThermalProfile.MODE_AUTO)
                 summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
                 isIconSpaceReserved = false
                 isEnabled = ThermalProfile.isAvailable()
+                setOnPreferenceChangeListener { pref, value ->
+                    if (value != ThermalProfile.MODE_NO_LIMITS) {
+                        return@setOnPreferenceChangeListener true
+                    }
+                    AlertDialog.Builder(context)
+                        .setTitle(R.string.thermal_nolimits_title)
+                        .setMessage(R.string.thermal_nolimits_message)
+                        .setPositiveButton(R.string.thermal_nolimits_confirm) { _, _ ->
+                            (pref as ListPreference).value = ThermalProfile.MODE_NO_LIMITS
+                        }
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .show()
+                    false
+                }
             }
         )
         thermal.addPreference(
