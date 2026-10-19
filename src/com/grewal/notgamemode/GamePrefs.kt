@@ -38,8 +38,13 @@ class GamePrefs(context: Context) {
     fun expertPreset(pkg: String) =
         prefs.getInt(expertPresetKey(pkg), TouchFeatureManager.EXPERT_RANGE.def)
 
+    /** One of the ThermalProfile.MODE_* values. */
+    val thermalMode: String
+        get() = prefs.getString(KEY_THERMAL_MODE, ThermalProfile.MODE_AUTO)!!
+
     companion object {
         const val NAME = "game_mode"
+        const val KEY_THERMAL_MODE = "thermal_mode"
         private const val KEY_CUSTOM = "custom_packages"
 
         fun enabledKey(pkg: String) = "enabled_$pkg"

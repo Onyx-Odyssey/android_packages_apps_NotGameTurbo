@@ -7,3 +7,7 @@ allow platform_app vendor_sysfs_touch:file rw_file_perms;
 allow priv_app vendor_sysfs_touch:file rw_file_perms;
 
 typeattribute vendor_sysfs_touch mlstrustedobject;
+
+# Thermal scenario per app (thermal_message/sconfig, labeled in the device tree)
+allow { platform_app priv_app } sysfs_thermal:dir search;
+allow { platform_app priv_app } vendor_sysfs_thermal_sconfig:file rw_file_perms;

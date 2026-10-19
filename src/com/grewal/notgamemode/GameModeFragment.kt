@@ -17,6 +17,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceViewHolder
@@ -28,6 +29,9 @@ class GameModeFragment : SettingsBasePreferenceFragment() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setHasOptionsMenu(true)
+        // Same store as GamePrefs, which GameModeService reads
+        preferenceManager.setStorageDeviceProtected()
+        preferenceManager.sharedPreferencesName = GamePrefs.NAME
         prefs = GamePrefs(requireContext())
         rebuild()
     }
@@ -73,6 +77,38 @@ class GameModeFragment : SettingsBasePreferenceFragment() {
             pm.getInstalledApplications(PackageManager.ApplicationInfoFlags.of(0)).filter {
                 it.category == ApplicationInfo.CATEGORY_GAME && it.packageName !in custom
             }
+
+        val thermal =
+            PreferenceCategory(context).apply { title = getString(R.string.thermal_category_title) }
+        screen.addPreference(thermal)
+        thermal.addPreference(
+            ListPreference(context).apply {
+                key = GamePrefs.KEY_THERMAL_MODE
+                title = getString(R.string.thermal_mode_title)
+                setEntries(R.array.thermal_mode_entries)
+                entryValues =
+                    arrayOf<CharSequence>(
+                        ThermalProfile.MODE_AUTO,
+                        ThermalProfile.MODE_NORMAL,
+                        ThermalProfile.MODE_GAME,
+                    )
+                setDefaultValue(ThermalProfile.MODE_AUTO)
+                summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
+                isIconSpaceReserved = false
+                isEnabled = ThermalProfile.isAvailable()
+            }
+        )
+        thermal.addPreference(
+            Preference(context).apply {
+                summary =
+                    getString(
+                        if (ThermalProfile.isAvailable()) R.string.thermal_mode_footer
+                        else R.string.thermal_unavailable_summary
+                    )
+                isSelectable = false
+                isIconSpaceReserved = false
+            }
+        )
 
         val games =
             PreferenceCategory(context).apply { title = getString(R.string.games_category_title) }

@@ -11,12 +11,14 @@ import android.content.Intent
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.IBinder
+import android.os.PowerManager
 import android.util.Log
 
 class GameModeService : Service() {
 
     private lateinit var prefs: GamePrefs
     private lateinit var usageStats: UsageStatsManager
+    private lateinit var power: PowerManager
     private lateinit var thread: HandlerThread
     private lateinit var handler: Handler
 
@@ -38,6 +40,7 @@ class GameModeService : Service() {
         TouchFeatureManager.attach(this)
         prefs = GamePrefs(this)
         usageStats = getSystemService(UsageStatsManager::class.java)
+        power = getSystemService(PowerManager::class.java)
         thread = HandlerThread(TAG).apply { start() }
         handler = Handler(thread.looper)
         handler.post(poll)
@@ -65,6 +68,7 @@ class GameModeService : Service() {
         lastForeground = foreground
 
         val shouldEnable = foreground != null && prefs.isEnabled(foreground)
+        updateThermal(foreground, shouldEnable)
         if (shouldEnable) {
             if (!gameModeActive) {
                 gameModeActive = true
@@ -82,6 +86,19 @@ class GameModeService : Service() {
         } else if (gameModeActive) {
             stopGameMode()
         }
+    }
+
+    private fun updateThermal(foreground: String?, isGame: Boolean) {
+        val scenario =
+            when (prefs.thermalMode) {
+                ThermalProfile.MODE_NORMAL -> ThermalProfile.NORMAL
+                ThermalProfile.MODE_GAME -> ThermalProfile.GAME
+                // The last foreground app stays "foreground" with the screen off
+                else ->
+                    if (!power.isInteractive) ThermalProfile.NORMAL
+                    else ThermalProfile.forPackage(this, foreground, isGame)
+            }
+        ThermalProfile.apply(scenario)
     }
 
     private fun saveTuning() {

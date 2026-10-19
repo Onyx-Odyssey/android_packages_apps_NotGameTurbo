@@ -18,6 +18,16 @@
     <string name="retry">Retry</string>
     <string name="exit">Exit</string>
 
+    <string name="thermal_category_title">Thermal profile</string>
+    <string name="thermal_mode_title">Profile</string>
+    <string-array name="thermal_mode_entries">
+        <item>Automatic (per app)</item>
+        <item>Always normal</item>
+        <item>Always game</item>
+    </string-array>
+    <string name="thermal_mode_footer">Automatic uses Xiaomi\'s own thermal profiles: game for games and apps with game mode on, camera for the camera, video for video apps, navigation for maps, and normal for everything else and while the screen is off. Normal runs coolest.</string>
+    <string name="thermal_unavailable_summary">The thermal profile node is not writable on this build.</string>
+
     <string name="games_category_title">Games</string>
     <string name="custom_category_title">Custom apps</string>
 
