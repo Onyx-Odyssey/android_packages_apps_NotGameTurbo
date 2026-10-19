@@ -75,7 +75,9 @@ object ThermalProfile {
             ApplicationInfo.CATEGORY_GAME -> GAME
             ApplicationInfo.CATEGORY_VIDEO -> VIDEO
             ApplicationInfo.CATEGORY_MAPS -> NAVIGATION
-            else -> if (looksLikeGame(info)) GAME else NORMAL
+            // Apps that declare another category are not games, even with an engine inside.
+            ApplicationInfo.CATEGORY_UNDEFINED -> if (looksLikeGame(info)) GAME else NORMAL
+            else -> NORMAL
         }
     }
 
