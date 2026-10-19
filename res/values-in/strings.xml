@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: 2026 Fakhri Adi Saputra
+     SPDX-License-Identifier: Apache-2.0
+-->
+<resources>
+    <string name="app_name">NotGameTurbo</string>
+    <string name="settings_summary">Mode game sentuh dan penyetelan per aplikasi</string>
+
+    <string name="touchfeature_error_title">Touchfeature tidak tersedia</string>
+    <string name="touchfeature_error_message">Gagal terhubung ke layanan touchfeature, atau layanannya tidak ditemukan. Mode game tidak akan berfungsi.</string>
+    <string name="sysfs_error_title">Node sentuh tidak tersedia</string>
+    <string name="sysfs_error_message">Node sentuh di /sys/class/touch tidak ada atau tidak bisa ditulis. Mode game tidak akan berfungsi.</string>
+    <string name="backend_switch_hal">Gunakan touchfeature</string>
+    <string name="backend_switch_sysfs">Gunakan node sentuh</string>
+    <string name="backend_switched_hal">Beralih ke touchfeature</string>
+    <string name="backend_switched_sysfs">Beralih ke node sentuh</string>
+    <string name="retry">Coba lagi</string>
+    <string name="exit">Keluar</string>
+
+    <string name="thermal_category_title">Profil termal</string>
+    <string name="thermal_mode_title">Profil</string>
+    <string-array name="thermal_mode_entries">
+        <item>Otomatis (per aplikasi)</item>
+        <item>Selalu normal</item>
+        <item>Selalu game</item>
+        <item>Tanpa batas (bypass termal)</item>
+    </string-array>
+    <string name="thermal_mode_footer">Otomatis memakai profil termal bawaan Xiaomi: game untuk game dan aplikasi yang mode game-nya aktif, kamera untuk kamera, video untuk aplikasi video, navigasi untuk peta, dan normal untuk yang lainnya serta saat layar mati. Normal yang paling dingin. Tanpa batas kembali ke Otomatis setelah reboot.</string>
+    <string name="thermal_nolimits_title">Lewati mesin termal?</string>
+    <string name="thermal_nolimits_message">Yakin mau melewati mesin termal HP? HP bisa berubah jadi bom saku. Jangan dilempar ke orang lain.\n\nKali ini serius: ini beralih ke profil termal Xiaomi yang paling longgar, jadi HP bisa jadi sangat panas. Pakai hanya dengan pendingin sungguhan, seperti kipas pendingin HP. Main sambil dicas? Nyalakan Bypass charging (mode Bypass) dulu: profil tanpa batas Xiaomi juga melepas batas pengisian saat layar menyala, dan bypass menahan baterai agar tidak diisi, jadi HP berjalan langsung dari charger tanpa panas tambahan dari pengisian. Shutdown otomatis saat kepanasan dari kernel tetap melindungi HP, saat layar mati profilnya kembali ke normal, dan setelan ini mati sendiri setelah reboot.</string>
+    <string name="thermal_nolimits_confirm">Saya punya pendingin, lanjutkan</string>
+    <string name="thermal_unavailable_summary">Node profil termal tidak bisa ditulis di build ini.</string>
+
+    <string name="games_category_title">Game</string>
+    <string name="custom_category_title">Aplikasi kustom</string>
+
+    <string name="add_app_title">Tambah aplikasi…</string>
+    <string name="add_app_dialog_title">Pilih aplikasi</string>
+
+    <string name="remove_app_title">Hapus aplikasi</string>
+    <string name="remove_app_message">Hapus %1$s dari aplikasi kustom?</string>
+    <string name="remove_app_confirm">Hapus</string>
+    <string name="add_app_summary">Tekan lama aplikasi kustom untuk menghapusnya</string>
+
+    <string name="no_games_summary">Tidak ada game yang terdeteksi. Tambahkan aplikasi secara manual di bawah.</string>
+
+    <string name="app_enable_title">Aktifkan mode game</string>
+    <string name="app_enabled">Aktif</string>
+
+    <string name="touch_test_title">Tes polling rate</string>
+    <string name="touch_test_game_mode">Mode game</string>
+    <string name="touch_test_super_report">Super report</string>
+
+    <string name="super_report_title">Super report rate</string>
+    <string name="super_report_summary">Pelaporan super-resolusi 480 Hz (mode game 240 Hz)</string>
+
+    <string name="tuning_category_title">Penyetelan sentuh (mode game)</string>
+    <string name="tuning_unavailable_summary">Penyetelan sentuh tidak tersedia di panel ini.</string>
+    <string name="tune_up_threshold">Ambang angkat sentuhan</string>
+    <string name="tune_tolerance">Toleransi jitter</string>
+    <string name="tune_aim_sensitivity">Sensitivitas bidik</string>
+    <string name="tune_tap_stability">Stabilitas ketukan</string>
+    <string name="tune_edge_filter">Penolakan sentuhan tepi</string>
+
+    <string name="expert_mode_title">Mode ahli</string>
+    <string name="expert_mode_summary">Pakai preset penyetelan bawaan, bukan nilai manual</string>
+    <string name="expert_preset_title">Preset ahli</string>
+
+    <string name="debug_title">Debug mode HAL</string>
+    <string name="debug_querying">Mengambil data…</string>
+    <string name="debug_refresh">Muat ulang</string>
+
+    <string name="reset_title">Kembalikan ke default</string>
+    <string name="reset_message">Kembalikan setelan mode game aplikasi ini ke default?</string>
+</resources>
