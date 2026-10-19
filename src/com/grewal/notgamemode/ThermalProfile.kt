@@ -12,6 +12,7 @@ import android.content.pm.PackageManager
 import android.provider.MediaStore
 import android.util.Log
 import java.io.File
+import java.util.zip.ZipFile
 
 /**
  * Picks the mi_thermald scenario for the foreground app by writing thermal_message/sconfig.
@@ -39,7 +40,22 @@ object ThermalProfile {
     /** Reset to [MODE_AUTO] on every boot. */
     const val MODE_NO_LIMITS = "nolimits"
 
+    // Many games do not declare appCategory="game", so also look for a game engine's native
+    // library or Play Games Services
+    private const val PLAY_GAMES_APP_ID = "com.google.android.gms.games.APP_ID"
+    private val ENGINE_LIBS =
+        setOf(
+            "libunity.so",
+            "libil2cpp.so",
+            "libUE4.so",
+            "libUnreal.so",
+            "libgodot_android.so",
+        )
+    private const val COCOS_LIB_PREFIX = "libcocos"
+
     private var cameraPackages: Set<String>? = null
+    // Package -> (sourceDir, looks like a game); sourceDir changes on every update
+    private val engineGames = HashMap<String, Pair<String, Boolean>>()
     private var written: Int? = null
 
     fun isAvailable() = File(SCONFIG).canWrite()
@@ -51,7 +67,7 @@ object ThermalProfile {
         if (pkg in cameraPackages(context)) return CAMERA
         val info =
             try {
-                context.packageManager.getApplicationInfo(pkg, 0)
+                context.packageManager.getApplicationInfo(pkg, PackageManager.GET_META_DATA)
             } catch (e: PackageManager.NameNotFoundException) {
                 return NORMAL
             }
@@ -59,7 +75,7 @@ object ThermalProfile {
             ApplicationInfo.CATEGORY_GAME -> GAME
             ApplicationInfo.CATEGORY_VIDEO -> VIDEO
             ApplicationInfo.CATEGORY_MAPS -> NAVIGATION
-            else -> NORMAL
+            else -> if (looksLikeGame(info)) GAME else NORMAL
         }
     }
 
@@ -72,6 +88,45 @@ object ThermalProfile {
             Log.i(TAG, "sconfig $scenario")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to write sconfig $scenario", e)
+        }
+    }
+
+    private fun looksLikeGame(info: ApplicationInfo): Boolean {
+        if (info.flags and ApplicationInfo.FLAG_SYSTEM != 0) return false
+        val sourceDir = info.sourceDir ?: return false
+        engineGames[info.packageName]?.let { (dir, isGame) ->
+            if (dir == sourceDir) return isGame
+        }
+        val isGame =
+            info.metaData?.containsKey(PLAY_GAMES_APP_ID) == true || hasEngineLib(info)
+        engineGames[info.packageName] = sourceDir to isGame
+        if (isGame) Log.i(TAG, "${info.packageName} looks like a game")
+        return isGame
+    }
+
+    private fun isEngineLib(name: String) =
+        name in ENGINE_LIBS || (name.startsWith(COCOS_LIB_PREFIX) && name.endsWith(".so"))
+
+    private fun hasEngineLib(info: ApplicationInfo): Boolean {
+        // Extracted libraries, for apps installed with extractNativeLibs
+        if (info.nativeLibraryDir?.let { File(it).list() }?.any(::isEngineLib) == true) {
+            return true
+        }
+        // Otherwise they stay in the APKs (the ABI split for bundles); only the zip's
+        // central directory is read
+        val apks = listOf(info.sourceDir) + (info.splitSourceDirs ?: emptyArray())
+        return apks.any { apk ->
+            try {
+                ZipFile(apk).use { zip ->
+                    zip.entries().asSequence().any {
+                        it.name.startsWith("lib/") && isEngineLib(it.name.substringAfterLast('/'))
+                    }
+                }
+            } catch (e: Exception) {
+                // Cached as "not a game" like any other answer, so a bad APK is not retried
+                Log.w(TAG, "Cannot read $apk", e)
+                false
+            }
         }
     }
 
