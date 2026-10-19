@@ -47,7 +47,7 @@ class GameModeActivity : CollapsingToolbarBaseActivity() {
                             TouchFeatureManager.isAvailable(it)
                         }
                 runOnUiThread {
-                    if (!available && !isFinishing) {
+                    if (!available && !isFinishing && !isDestroyed) {
                         showBackendError(backend, alternatives)
                     }
                 }

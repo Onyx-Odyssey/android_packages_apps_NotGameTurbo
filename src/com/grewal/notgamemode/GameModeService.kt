@@ -12,6 +12,7 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.os.IBinder
 import android.os.PowerManager
+import android.os.UserManager
 import android.util.Log
 
 class GameModeService : Service() {
@@ -19,6 +20,7 @@ class GameModeService : Service() {
     private lateinit var prefs: GamePrefs
     private lateinit var usageStats: UsageStatsManager
     private lateinit var power: PowerManager
+    private lateinit var users: UserManager
     private lateinit var thread: HandlerThread
     private lateinit var handler: Handler
 
@@ -30,7 +32,12 @@ class GameModeService : Service() {
     private val poll =
         object : Runnable {
             override fun run() {
-                update()
+                // This is a persistent process: one failed poll must not take it down
+                try {
+                    update()
+                } catch (e: RuntimeException) {
+                    Log.e(TAG, "poll failed", e)
+                }
                 handler.postDelayed(this, POLL_INTERVAL_MS)
             }
         }
@@ -41,6 +48,7 @@ class GameModeService : Service() {
         prefs = GamePrefs(this)
         usageStats = getSystemService(UsageStatsManager::class.java)
         power = getSystemService(PowerManager::class.java)
+        users = getSystemService(UserManager::class.java)
         thread = HandlerThread(TAG).apply { start() }
         handler = Handler(thread.looper)
         handler.post(poll)
@@ -49,10 +57,13 @@ class GameModeService : Service() {
 
     override fun onDestroy() {
         handler.removeCallbacks(poll)
-        thread.quitSafely()
-        if (gameModeActive) {
-            stopGameMode()
+        // On the poll thread, so it cannot race a poll that is still running
+        handler.post {
+            if (gameModeActive) {
+                stopGameMode()
+            }
         }
+        thread.quitSafely()
         super.onDestroy()
     }
 
@@ -61,6 +72,11 @@ class GameModeService : Service() {
     private fun update() {
 
         if (manualOverride) {
+            return
+        }
+
+        // Usage events are not available before the first unlock after boot
+        if (!users.isUserUnlocked) {
             return
         }
 
@@ -141,7 +157,18 @@ class GameModeService : Service() {
 
     private fun currentForegroundPackage(): String? {
         val now = System.currentTimeMillis()
-        val events = usageStats.queryEvents(now - QUERY_WINDOW_MS, now)
+        // queryEvents throws IllegalStateException while the user (or ShortcutService, which
+        // finishes unlocking a little later) is still locked
+        val events =
+            try {
+                usageStats.queryEvents(now - QUERY_WINDOW_MS, now)
+            } catch (e: IllegalStateException) {
+                Log.w(TAG, "usage events unavailable: ${e.message}")
+                return null
+            } catch (e: SecurityException) {
+                Log.w(TAG, "usage events denied: ${e.message}")
+                return null
+            } ?: return null
         val event = android.app.usage.UsageEvents.Event()
         var pkg: String? = null
         while (events.hasNextEvent()) {
